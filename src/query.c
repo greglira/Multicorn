@@ -21,6 +21,10 @@
 #define get_attname(x, y) get_attname(x, y, true)
 #endif
 
+void extractClauseFromBoolVar(Relids base_relids,
+                              Var *node,
+                              List **quals);
+
 void extractClauseFromOpExpr(PlannerInfo *root,
 						Relids base_relids,
 						OpExpr *node,
@@ -327,6 +331,11 @@ extractRestrictions(PlannerInfo *root,
 											   (ScalarArrayOpExpr *) node,
 											   quals);
 			break;
+        case T_Var:
+            extractClauseFromBoolVar(base_relids,
+                                     (Var *) node,
+                                     quals);
+            break;
 		default:
 			{
 				ereport(WARNING,
@@ -337,6 +346,26 @@ extractRestrictions(PlannerInfo *root,
 			break;
 	}
 }
+
+
+/*
+ *	Convert a boolean "VAR" condition (= TRUE, IS TRUE)
+ *	to a suitable intermediate representation.
+ */
+void
+extractClauseFromBoolVar(Relids base_relids,
+                          Var *node,
+                          List **quals)
+{
+    MulticornBaseQual *result;
+    result = makeQual(node->varattno, "=",
+                      (Expr *) makeBoolConst(true, false),
+                      false,
+                      false);
+    *quals = lappend(*quals, result);
+}
+
+
 
 /*
  *	Build an intermediate value representation for an OpExpr,
