@@ -15,10 +15,3 @@ if [ ! -x "${PG_CONFIG}" ]; then
   echo "Please check if you installed the PostgreSQL development packages."
   exit 1
 fi
-
-if [ ${PY_VERSION} != "2.7" ] && [ ${PY_VERSION} != "2.6" ]; then
-  if [ ${PY27_VERSION} != "2.7" ]; then
-    echo "Found Python $PY_VERSION, but 2.6 is required."
-    exit 2
-  fi
-fi

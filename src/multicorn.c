@@ -126,6 +126,7 @@ _PG_init()
 	HASHCTL		ctl;
 	MemoryContext oldctx = MemoryContextSwitchTo(CacheMemoryContext);
 	bool need_import_plpy = false;
+	PyObject *sys_path;
 
 #if PY_MAJOR_VERSION >= 3
 	/* Try to load plpython3 with its own module */
@@ -142,6 +143,10 @@ _PG_init()
 	PG_END_TRY();
 #endif
 	Py_Initialize();
+
+	sys_path = PySys_GetObject("path");
+	PyList_Append(sys_path, PyUnicode_FromString("@envSitePackagesPath@"));
+
 	if (need_import_plpy)
 		PyImport_ImportModule("plpy");
 	RegisterXactCallback(multicorn_xact_callback, NULL);
