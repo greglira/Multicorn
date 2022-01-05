@@ -517,7 +517,6 @@ multicornBeginForeignScan(ForeignScanState *node, int eflags)
 	execstate->values = palloc(sizeof(Datum) * tupdesc->natts);
 	execstate->nulls = palloc(sizeof(bool) * tupdesc->natts);
 	execstate->qual_list = NULL;
-#if PG_VERSION_NUM < 140000
 	foreach(lc, fscan->fdw_exprs)
 	{
 		extractRestrictions(NULL, /* FIXME: set this properly. Parameter is used on PG14+ only, we can use NULL on older versions */
@@ -525,7 +524,6 @@ multicornBeginForeignScan(ForeignScanState *node, int eflags)
 							((Expr *) lfirst(lc)),
 							&execstate->qual_list);
 	}
-#endif
 	initConversioninfo(execstate->cinfos, TupleDescGetAttInMetadata(tupdesc));
 	node->fdw_state = execstate;
 }

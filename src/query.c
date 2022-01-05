@@ -21,7 +21,8 @@
 #define get_attname(x, y) get_attname(x, y, true)
 #endif
 
-void extractClauseFromBoolVar(Relids base_relids,
+void extractClauseFromBoolVar(PlannerInfo *root,
+                              Relids base_relids,
                               Var *node,
                               List **quals);
 
@@ -30,7 +31,8 @@ void extractClauseFromOpExpr(PlannerInfo *root,
 						OpExpr *node,
 						List **quals);
 
-void extractClauseFromNullTest(Relids base_relids,
+void extractClauseFromNullTest(PlannerInfo *root,
+                          Relids base_relids,
 						  NullTest *node,
 						  List **quals);
 
@@ -323,7 +325,7 @@ extractRestrictions(PlannerInfo *root,
 									(OpExpr *) node, quals);
 			break;
 		case T_NullTest:
-			extractClauseFromNullTest(base_relids,
+			extractClauseFromNullTest(root, base_relids,
 									  (NullTest *) node, quals);
 			break;
 		case T_ScalarArrayOpExpr:
@@ -332,7 +334,7 @@ extractRestrictions(PlannerInfo *root,
 											   quals);
 			break;
         case T_Var:
-            extractClauseFromBoolVar(base_relids,
+            extractClauseFromBoolVar(root, base_relids,
                                      (Var *) node,
                                      quals);
             break;
@@ -353,7 +355,8 @@ extractRestrictions(PlannerInfo *root,
  *	to a suitable intermediate representation.
  */
 void
-extractClauseFromBoolVar(Relids base_relids,
+extractClauseFromBoolVar(PlannerInfo *root,
+                         Relids base_relids,
                           Var *node,
                           List **quals)
 {
@@ -444,7 +447,8 @@ extractClauseFromScalarArrayOpExpr(PlannerInfo *root,
  *	to a suitable intermediate representation.
  */
 void
-extractClauseFromNullTest(Relids base_relids,
+extractClauseFromNullTest(PlannerInfo *root,
+                          Relids base_relids,
 						  NullTest *node,
 						  List **quals)
 {
